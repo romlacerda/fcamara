@@ -5,6 +5,7 @@ import {
 import { Container } from '../../components/Container/style';
 import MessageForm from '../../components/Form';
 import { insertMessage, getSubjects } from '../../services/api';
+import { Alert } from '../../components/Alert';
 
 const initialValues = {
   name: '', email: '', phone: '', subject: '', body: '',
@@ -13,6 +14,7 @@ const initialValues = {
 class Message extends React.Component {
   state = {
     availableSubjects: [],
+    submitted: false,
   }
 
   componentDidMount() {
@@ -20,14 +22,16 @@ class Message extends React.Component {
   }
 
   handleSubmit = (values) => {
-    insertMessage(values);
+    insertMessage(values).then(() => this.setState({ submitted: true }));
   }
 
   render() {
-    const { availableSubjects } = this.state;
+    const { availableSubjects, submitted } = this.state;
     return (
       <Container>
         <Paper style={{ flex: 1, marginTop: '1em' }}>
+          { submitted ? <Alert severity="success">Mensagem cadastrada com sucesso!</Alert> : '' }
+
           <MessageForm handleSubmit={this.handleSubmit} initialValues={initialValues} subjects={availableSubjects} />
         </Paper>
       </Container>
