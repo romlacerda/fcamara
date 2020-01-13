@@ -16,7 +16,7 @@ import { ErrorLabel } from '../ErrorLabel/style';
 
 const validations = yup.object().shape({
   name: yup.string().required('O nome é obrigatório'),
-  email: yup.string().email().required('O email é obrigatório'),
+  email: yup.string('O email é obrigatório').email('O email é obrigatório').required('O email é obrigatório'),
   subject: yup.string().required('O assunto é obrigatório'),
   phone: yup.string().trim().matches(/^\([0-9]{2}\) [0-9]?[0-9]{4}-[0-9]{4}$/, 'Telefone inválido. O formato deve ser: (XX) XXXX-XXXX'),
   body: yup.string().required('O corpo da mensagem é obrigatório'),
