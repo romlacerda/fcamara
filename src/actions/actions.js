@@ -1,5 +1,5 @@
 import {
-  SELECT_MESSAGE, DELETE_MESSAGE, ADD_MESSAGES,
+  SELECT_MESSAGE, DELETE_MESSAGE, ADD_MESSAGES, CHANGE_MSG_STATUS,
 } from './actionTypes';
 
 export const selectMessage = (message) => ({
@@ -15,4 +15,9 @@ export const deleteMsg = (messages) => ({
 export const addMessages = (messages) => ({
   type: ADD_MESSAGES,
   messages,
+});
+
+export const changeMessageStatus = (status) => ({
+  type: CHANGE_MSG_STATUS,
+  status,
 });

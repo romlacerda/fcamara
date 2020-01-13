@@ -1,101 +1,82 @@
-import React, { Component } from 'react';
+import React from 'react';
 import {
-  TextField, Button, Select, MenuItem, FormControl,
+  Button, MenuItem,
 } from '@material-ui/core';
-import InputMask from 'react-input-mask';
 import {
-  Form,
+  Formik, Form as FormikForm, Field,
+} from 'formik';
+import PropTypes from 'prop-types';
+import * as yup from 'yup';
+import { TextField as TF, Select as SL } from 'formik-material-ui';
+
+import {
+  Form as FormStyle,
 } from './style';
-import { insertMessage, getSubjects } from '../../services/api';
+import { ErrorLabel } from '../ErrorLabel/style';
 
-class MessageForm extends Component {
-  state = {
-    name: null,
-    email: null,
-    subject: null,
-    phone: null,
-    body: null,
-    date: new Date(),
-    availableSubjects: [],
-  }
+const validations = yup.object().shape({
+  name: yup.string().required('O nome é obrigatório'),
+  email: yup.string().required('O email é obrigatório'),
+  subject: yup.string().required('O assunto é obrigatório'),
+  phone: yup.string().trim().matches(/^\([0-9]{2}\) [0-9]?[0-9]{4}-[0-9]{4}$/, 'Telefone inválido. O formato deve ser: (XX) XXXX-XXXX'),
+  body: yup.string().required('O corpo da mensagem é obrigatório'),
+});
 
-  componentDidMount() {
-    getSubjects().then((response) => this.setState({ availableSubjects: response.data }));
-  }
-
-  changeHandler = (e) => {
-    if (e.target.name === 'name') {
-      e.target.value = e.target.value.replace(/[^A-Za-z ]/, '');
-    }
-
-    this.setState({ [e.target.name]: e.target.value });
-  }
-
-  submitForm = () => {
-    insertMessage(this.state);
-  }
-
-  render() {
-    const {
-      phone, availableSubjects, subject, name, body,
-    } = this.state;
-    return (
-      <Form>
-        <TextField
-          label="Nome"
-          variant="outlined"
-          value={name}
-          required
-          onChange={this.changeHandler}
-          name="name"
-        />
-        <TextField
-          label="Email"
-          variant="outlined"
-          required
-          onChange={this.changeHandler}
-          name="email"
-          inputProps={{
-            type: 'email',
-          }}
-        />
-        <Select labelId="Assunto" name="subject" variant="outlined" displayEmpty value={subject} onChange={this.changeHandler}>
-          <MenuItem value="" disabled selected>
-            Assunto
-          </MenuItem>
-          {availableSubjects.map((subj) => <MenuItem value={subj}>{subj}</MenuItem>)}
-        </Select>
-        <InputMask
-          mask="(99) 99999-9999"
-          value={phone}
-          onChange={this.changeHandler}
-        >
-          <TextField
-            label="Telefone"
+const MessageForm = ({ initialValues, handleSubmit, subjects }) => (
+  <Formik initialValues={initialValues} onSubmit={handleSubmit} validationSchema={validations}>
+    {({ values, errors, touched }) => (
+      <FormStyle>
+        <FormikForm>
+          <Field name="name" component={TF} variant="outlined" label="Nome" />
+          <Field name="email" component={TF} variant="outlined" label="Email" />
+          <Field name="phone" component={TF} variant="outlined" label="Telefone" />
+          <Field
+            name="subject"
+            component={SL}
             variant="outlined"
-            onChange={this.changeHandler}
-            name="phone"
-            value={phone}
+            label="Telefone"
+            displayEmpty
+            helperText={touched.subject ? errors.subject : ''}
+            error={touched.subject && Boolean(errors.subject)}
+          >
+            <MenuItem value="">Selecione o assunto</MenuItem>
+            {subjects.map((subj) => <MenuItem key={subj.id} value={subj.description}>{subj.description}</MenuItem>)}
+          </Field>
+          {errors.subject
+              && touched.subject
+              && (
+                <ErrorLabel>
+                  {errors.subject}
+                </ErrorLabel>
+              )}
+          <Field
+            name="body"
+            component={TF}
+            variant="outlined"
+            label="Mensagem"
+            placeholder="Digite sua mensagem aqui"
+            multiline
+            rows={2}
+            rowsMax={4}
+            inputProps={{
+              maxLength: 500,
+            }}
           />
-        </InputMask>
-        <TextField
-          placeholder="Digite sua mensagem aqui"
-          multiline
-          rows={2}
-          rowsMax={4}
-          variant="outlined"
-          onChange={this.changeHandler}
-          name="body"
-          inputProps={{
-            maxLength: 500,
-          }}
-        />
-        <p>{body != null ? `${body.length}/500` : '0/500'}</p>
-        <Button type="submit" variant="contained" color="primary" onClick={this.submitForm}>Cadastrar</Button>
-      </Form>
-    );
-  }
-}
+
+          <p>{values.body != null ? `${values.body.length}/500` : '0/500'}</p>
+
+          <Button type="submit" variant="contained" color="primary">Cadastrar</Button>
+        </FormikForm>
+      </FormStyle>
+    )}
 
 
+  </Formik>
+);
+
+MessageForm.propTypes = {
+  initialValues: PropTypes.object.isRequired,
+  handleSubmit: PropTypes.func.isRequired,
+  subjects: PropTypes.array.isRequired,
+};
 export default MessageForm;

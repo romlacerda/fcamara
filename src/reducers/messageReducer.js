@@ -1,10 +1,11 @@
 import {
-  SELECT_MESSAGE, DELETE_MESSAGE, ADD_MESSAGES,
+  SELECT_MESSAGE, DELETE_MESSAGE, ADD_MESSAGES, CHANGE_MSG_STATUS,
 } from '../actions/actionTypes';
 
 const initialState = {
   messageSelected: null,
   messages: [],
+  deleted: false,
 };
 
 const messageReducer = (state = initialState, action) => {
@@ -18,11 +19,17 @@ const messageReducer = (state = initialState, action) => {
       return {
         ...state,
         messages: action.messages,
+        deleted: true,
       };
     case ADD_MESSAGES:
       return {
         ...state,
         messages: action.messages,
+      };
+    case CHANGE_MSG_STATUS:
+      return {
+        ...state,
+        deleted: action.status,
       };
     default:
       return state;

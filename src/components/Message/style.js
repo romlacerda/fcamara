@@ -4,6 +4,7 @@ export const Message = styled.div`
   background-color: white;
   border: 1px solid black;
   padding: 1em;
+  margin-top: 10px;
 `;
 
 export const Container = styled.div`

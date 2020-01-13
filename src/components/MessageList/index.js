@@ -2,23 +2,19 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import moment from 'moment';
+import PropTypes from 'prop-types';
 import { List } from '../List/style';
 import Item from '../List/Item';
 import { getMessages } from '../../services/api';
 import { addMessages } from '../../actions/actions';
 
 class MessageList extends Component {
-  state = {
-    messages: [],
-  }
-
   componentDidMount() {
     this.listMessagesFromApi();
   }
 
   listMessagesFromApi = async () => {
     const messagesApi = await getMessages();
-    this.setState({ messages: messagesApi.data });
     const { addMessages: add } = this.props;
     add(messagesApi.data);
   }
@@ -35,6 +31,14 @@ class MessageList extends Component {
   }
 }
 
+MessageList.propTypes = {
+  messages: PropTypes.array.isRequired,
+  addMessage: PropTypes.func,
+};
+
+MessageList.defaultProps = {
+  addMessage: () => {},
+};
 const mapStateToProps = (store) => ({
   deleted: store.messageState.deleted,
   messages: store.messageState.messages,
